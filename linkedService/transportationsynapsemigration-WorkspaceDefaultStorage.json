@@ -1,15 +1,15 @@
 {
 	"name": "transportationsynapsemigration-WorkspaceDefaultStorage",
-	"type": "Microsoft.Synapse/workspaces/linkedservices",
 	"properties": {
-		"typeProperties": {
-			"url": "https://migrationmk.dfs.core.windows.net"
-		},
+		"annotations": [],
 		"type": "AzureBlobFS",
-		"connectVia": {
-			"referenceName": "AutoResolveIntegrationRuntime",
-			"type": "IntegrationRuntimeReference"
+		"typeProperties": {
+			"url": "https://adfteststoragebhavana.dfs.core.windows.net/"
 		},
-		"annotations": []
-	}
+		"connectVia": {
+			"referenceName": "IR-Azure-Auto",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/linkedservices"
 }
