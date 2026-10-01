@@ -11,7 +11,6 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": "sales.csv",
-				"folderPath": "migration-test/csv",
 				"fileSystem": "migrationcontainer"
 			},
 			"columnDelimiter": ",",
