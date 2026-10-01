@@ -3,68 +3,28 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Generate_CSV_And_Parquet",
-				"type": "SynapseNotebook",
+				"name": "Generate_CSV_And_Parque",
+				"type": "Wait",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebook": {
-						"referenceName": "NB_Read_Raw_Data",
-						"type": "NotebookReference"
-					},
-					"sparkPool": {
-						"referenceName": "transportation",
-						"type": "BigDataPoolReference"
-					},
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"numExecutors": null
+					"waitTimeInSeconds": 1
 				}
 			},
 			{
 				"name": "Transform_Parquet",
-				"type": "SynapseNotebook",
+				"type": "Wait",
 				"dependsOn": [
 					{
-						"activity": "Generate_CSV_And_Parquet",
+						"activity": "Generate_CSV_And_Parque",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebook": {
-						"referenceName": "NB_Transform_Cab_Data",
-						"type": "NotebookReference"
-					},
-					"sparkPool": {
-						"referenceName": "transportation",
-						"type": "BigDataPoolReference"
-					},
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"numExecutors": null
+					"waitTimeInSeconds": 1
 				}
 			}
 		],
