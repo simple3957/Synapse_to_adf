@@ -2,17 +2,14 @@
 	"name": "DS_Customers_CSV_Sink",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "Sathvik_ADF",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
-				"fileName": "customers.csv",
-				"folderPath": "migration-test/csv/customers",
-				"fileSystem": "migrationcontainer"
+				"type": "AzureBlobFSLocation"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
