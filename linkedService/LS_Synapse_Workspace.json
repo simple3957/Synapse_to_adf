@@ -1,0 +1,16 @@
+{
+	"name": "LS_Synapse_Workspace",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSynapseArtifacts",
+		"typeProperties": {
+			"endpoint": "https://workspacecr.dev.azuresynapse.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/da8bc354-61ae-4ca3-ad35-7bb26d9a7cad/resourceGroups/RG-Synapse-sample/providers/Microsoft.Synapse/workspaces/workspacecr"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
