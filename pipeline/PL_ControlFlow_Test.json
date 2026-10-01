@@ -1,0 +1,98 @@
+{
+	"name": "PL_ControlFlow_Test",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach_Table",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.TableList",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Set_CurrentTable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "CurrentTable",
+								"value": {
+									"value": "@item()",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "If_Stage_Table",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Set_CurrentTable",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains(item(), 'stage')",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Wait_DW",
+										"type": "Wait",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"waitTimeInSeconds": 1
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Wait_Stage",
+										"type": "Wait",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"waitTimeInSeconds": 1
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"TableList": {
+				"type": "array",
+				"defaultValue": [
+					"stage.NYCCabTrip_Green",
+					"stage.NYCCabTrip_Yellow",
+					"dw.FactCabTrip"
+				]
+			}
+		},
+		"variables": {
+			"CurrentTable": {
+				"type": "String"
+			}
+		},
+		"annotations": [
+			"ADFTest"
+		]
+	}
+}
