@@ -1,0 +1,132 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "sathvik-df"
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"Sathvik_ADF_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Sathvik_ADF'"
+		},
+		"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:transportationsynapsemigration.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adfmigrationstorage.dfs.core.windows.net/"
+		},
+		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
+			"type": "string",
+			"defaultValue": "https://workspacecr.dev.azuresynapse.net"
+		},
+		"Sathvik_ADF_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adfmigrationstorage.dfs.core.windows.net/"
+		},
+		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adfteststoragebhavana.dfs.core.windows.net/"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "sathvik-df_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureDataLakeStorage1_accountKey": {
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					},
+					"Sathvik_ADF_accountKey": {
+						"value": "[parameters('Sathvik_ADF_accountKey')]"
+					},
+					"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
+						"value": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
+					},
+					"AzureDataLakeStorage1_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+					},
+					"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
+						"value": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]"
+					},
+					"Sathvik_ADF_properties_typeProperties_url": {
+						"value": "[parameters('Sathvik_ADF_properties_typeProperties_url')]"
+					},
+					"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
+						"value": "[parameters('transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "sathvik-df_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'sathvik-df_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "sathvik-df_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'sathvik-df_ArmTemplate_1')]"
+			]
+		}
+	]
+}
