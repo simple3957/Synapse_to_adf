@@ -87,13 +87,19 @@
 							"inputs": [
 								{
 									"referenceName": "AzureSynapseAnalyticsTable2",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"pSchema": "@item().TABLE_SCHEMA"
+									}
 								}
 							],
 							"outputs": [
 								{
 									"referenceName": "DS_ADLS_Discovery_Parquet",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"pFileName": "@concat(item().TABLE_SCHEMA, '_', item().TABLE_NAME, '.parquet')"
+									}
 								}
 							]
 						}
