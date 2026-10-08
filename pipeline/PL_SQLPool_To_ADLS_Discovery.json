@@ -61,7 +61,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "SqlDWSource",
-									"sqlReaderQuery": "@concat(\n'SELECT * FROM [',\nitem().TABLE_SCHEMA,\n'].[',\nitem().TABLE_NAME,\n']'\n)",
+									"sqlReaderQuery": {
+										"value": "@concat(\n'SELECT * FROM [',\nitem().TABLE_SCHEMA,\n'].[',\nitem().TABLE_NAME,\n']'\n)",
+										"type": "Expression"
+									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -77,6 +80,68 @@
 								"enableStaging": false,
 								"translator": {
 									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "LocationKey",
+												"type": "Int32",
+												"physicalType": "int"
+											},
+											"sink": {
+												"name": "LocationKey",
+												"type": "Int32",
+												"physicalType": "INT_32"
+											}
+										},
+										{
+											"source": {
+												"name": "LocationID",
+												"type": "Int16",
+												"physicalType": "smallint"
+											},
+											"sink": {
+												"name": "LocationID",
+												"type": "Int16",
+												"physicalType": "INT_32"
+											}
+										},
+										{
+											"source": {
+												"name": "Borough",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "Borough",
+												"type": "String",
+												"physicalType": "UTF8"
+											}
+										},
+										{
+											"source": {
+												"name": "Zone",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "Zone",
+												"type": "String",
+												"physicalType": "UTF8"
+											}
+										},
+										{
+											"source": {
+												"name": "service_zone",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "service_zone",
+												"type": "String",
+												"physicalType": "UTF8"
+											}
+										}
+									],
 									"typeConversion": true,
 									"typeConversionSettings": {
 										"allowDataTruncation": true,
@@ -89,7 +154,8 @@
 									"referenceName": "AzureSynapseAnalyticsTable2",
 									"type": "DatasetReference",
 									"parameters": {
-										"pSchema": "@item().TABLE_SCHEMA"
+										"pSchema": "@item().TABLE_SCHEMA",
+										"pTable": "@item().TABLE_NAME"
 									}
 								}
 							],
