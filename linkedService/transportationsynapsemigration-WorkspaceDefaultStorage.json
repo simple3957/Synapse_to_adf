@@ -5,10 +5,6 @@
 		"type": "AzureBlobFS",
 		"typeProperties": {
 			"url": "https://adfteststoragebhavana.dfs.core.windows.net/"
-		},
-		"connectVia": {
-			"referenceName": "IR-Azure-Auto",
-			"type": "IntegrationRuntimeReference"
 		}
 	},
 	"type": "Microsoft.Synapse/workspaces/linkedservices"

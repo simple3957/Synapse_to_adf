@@ -2,7 +2,7 @@
 	"name": "DS_Parquet_Sales",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "transportationsynapsemigration-WorkspaceDefaultStorage",
+			"referenceName": "Sathvik_ADF",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],

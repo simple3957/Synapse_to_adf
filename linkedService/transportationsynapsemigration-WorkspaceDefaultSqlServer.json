@@ -11,10 +11,6 @@
 			}
 		},
 		"type": "AzureSqlDW",
-		"connectVia": {
-			"referenceName": "ADFIR",
-			"type": "IntegrationRuntimeReference"
-		},
 		"annotations": []
 	}
 }
