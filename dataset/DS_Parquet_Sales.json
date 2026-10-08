@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "sales.csv",
-				"folderPath": "migration-test/parquet/sales",
+				"fileName": "emp.parquet",
+				"folderPath": "migration-test/parquet/emp",
 				"fileSystem": "migrationcontainer"
 			},
 			"compressionCodec": "snappy"
