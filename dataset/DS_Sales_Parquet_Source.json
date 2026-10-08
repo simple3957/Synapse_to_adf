@@ -2,7 +2,7 @@
 	"name": "DS_Sales_Parquet_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "Sathvik_ADF",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
