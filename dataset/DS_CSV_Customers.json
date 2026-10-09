@@ -2,7 +2,7 @@
 	"name": "DS_CSV_Customers",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "transportationsynapsemigration-WorkspaceDefaultStorage",
+			"referenceName": "Sathvik_ADF",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,8 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "customers.csv",
-				"folderPath": "migration-test/csv",
+				"fileName": "Customers.csv",
 				"fileSystem": "migrationcontainer"
 			},
 			"columnDelimiter": ",",

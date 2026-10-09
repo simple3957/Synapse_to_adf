@@ -1,0 +1,21 @@
+{
+	"name": "DS_Sales_Parquet_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sathvik_ADF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "sales.parquet",
+				"folderPath": "migration-test/parquet/sales",
+				"fileSystem": "migrationcontainer"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

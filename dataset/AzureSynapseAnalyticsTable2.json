@@ -1,0 +1,39 @@
+{
+	"name": "AzureSynapseAnalyticsTable2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pSchema": {
+				"type": "string"
+			},
+			"pTable": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "CabTypeKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CabTypeID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "CabTypeDescription",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dw",
+			"table": "DimCabType"
+		}
+	}
+}

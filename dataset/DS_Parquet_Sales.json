@@ -2,7 +2,7 @@
 	"name": "DS_Parquet_Sales",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "transportationsynapsemigration-WorkspaceDefaultStorage",
+			"referenceName": "Sathvik_ADF",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,7 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "migration-test/parquet/sales",
+				"fileName": "emp.parquet",
+				"folderPath": "migration-test/parquet/emp",
 				"fileSystem": "migrationcontainer"
 			},
 			"compressionCodec": "snappy"

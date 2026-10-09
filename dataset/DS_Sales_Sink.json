@@ -1,5 +1,5 @@
 {
-	"name": "DS_CSV_Sales",
+	"name": "DS_Sales_Sink",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "Sathvik_ADF",
@@ -10,7 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "emp.csv",
+				"fileName": "sales.csv",
+				"folderPath": "migration-test/csv/sales",
 				"fileSystem": "migrationcontainer"
 			},
 			"columnDelimiter": ",",
@@ -18,24 +19,6 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "SaleId",
-				"type": "String"
-			},
-			{
-				"name": "CustomerId",
-				"type": "String"
-			},
-			{
-				"name": "Product",
-				"type": "String"
-			},
-			{
-				"name": "Amount",
-				"type": "Int64"
-			}
-		]
-	},
-	"type": "Microsoft.Synapse/workspaces/datasets"
+		"schema": []
+	}
 }

@@ -1,0 +1,21 @@
+{
+	"name": "DS_Cutomers_Parquet_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sathvik_ADF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "customers.parquet",
+				"folderPath": "migration-test/parquet/customers",
+				"fileSystem": "migrationcontainer"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

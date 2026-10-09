@@ -1,8 +1,8 @@
 {
-	"name": "DS_CSV_Sales",
+	"name": "DS_Customers_CSV_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Sathvik_ADF",
+			"referenceName": "AzureDataLakeStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "emp.csv",
+				"fileName": "Customers.csv",
 				"fileSystem": "migrationcontainer"
 			},
 			"columnDelimiter": ",",
@@ -20,22 +20,17 @@
 		},
 		"schema": [
 			{
-				"name": "SaleId",
-				"type": "String"
-			},
-			{
 				"name": "CustomerId",
 				"type": "String"
 			},
 			{
-				"name": "Product",
+				"name": "CustomerName",
 				"type": "String"
 			},
 			{
-				"name": "Amount",
-				"type": "Int64"
+				"name": "City",
+				"type": "String"
 			}
 		]
-	},
-	"type": "Microsoft.Synapse/workspaces/datasets"
+	}
 }

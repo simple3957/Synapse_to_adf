@@ -11,11 +11,7 @@
 			"DedicatedSQL"
 		],
 		"type": "AzureSqlDWTable",
-		"schema": [],
-		"typeProperties": {
-			"schema": "dw",
-			"table": "DimCabType"
-		}
+		"schema": []
 	},
 	"type": "Microsoft.Synapse/workspaces/datasets"
 }
