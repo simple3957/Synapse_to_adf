@@ -8,6 +8,9 @@
 		"AzureDataLakeStorage1_accountKey": {
 			"value": ""
 		},
+		"AzureSynapseAnalytics1_password": {
+			"value": ""
+		},
 		"Sathvik_ADF_accountKey": {
 			"value": ""
 		},
@@ -15,7 +18,16 @@
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:transportationsynapsemigration.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"value": "https://adfmigrationstorage.dfs.core.windows.net/"
+			"value": "https://datamigrationadftofabric.dfs.core.windows.net/"
+		},
+		"AzureSynapseAnalytics1_properties_typeProperties_server": {
+			"value": "transportationmigration.sql.azuresynapse.net"
+		},
+		"AzureSynapseAnalytics1_properties_typeProperties_database": {
+			"value": "transportationdedicated"
+		},
+		"AzureSynapseAnalytics1_properties_typeProperties_userName": {
+			"value": "transportationmk"
 		},
 		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
 			"value": "https://workspacecr.dev.azuresynapse.net"
