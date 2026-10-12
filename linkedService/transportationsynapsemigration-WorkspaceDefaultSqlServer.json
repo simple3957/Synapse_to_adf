@@ -13,7 +13,7 @@
 		"type": "AzureSqlDW",
 		"annotations": [],
 		"connectVia": {
-			"referenceName": "integrationRuntime7593",
+			"referenceName": "AutoResolveIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
 		}
 	}
