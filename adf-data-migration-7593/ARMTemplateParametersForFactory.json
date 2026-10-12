@@ -15,7 +15,7 @@
 			"value": ""
 		},
 		"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
-			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:transportationsynapsemigration.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+			"value": ""
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://datamigrationadftofabric.dfs.core.windows.net/"

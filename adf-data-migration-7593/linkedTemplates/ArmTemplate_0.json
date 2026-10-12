@@ -7,10 +7,21 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-data-migration-7593"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"AzureSynapseAnalytics1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'AzureSynapseAnalytics1'"
+		},
+		"Sathvik_ADF_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Sathvik_ADF'"
+		},
 		"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:transportationsynapsemigration.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'"
 		},
 		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
 			"type": "string",
@@ -19,6 +30,26 @@
 		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adfteststoragebhavana.dfs.core.windows.net/"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
+		},
+		"AzureSynapseAnalytics1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "transportationmigration.sql.azuresynapse.net"
+		},
+		"AzureSynapseAnalytics1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "transportationdedicated"
+		},
+		"AzureSynapseAnalytics1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "transportationmk"
+		},
+		"Sathvik_ADF_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -257,24 +288,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultSqlServer')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"DBName": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"connectionString": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultStorage')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -435,150 +448,223 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimCabType')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {}
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimLocation')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalytics1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"server": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('AzureSynapseAnalytics1_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Sathvik_ADF')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Sathvik_ADF_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('Sathvik_ADF_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
+					"referenceName": "AzureSynapseAnalytics1",
 					"type": "LinkedServiceReference"
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
+				"annotations": [],
 				"type": "AzureSqlDWTable",
-				"schema": [],
+				"schema": [
+					{
+						"name": "LocationKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "LocationID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "Borough",
+						"type": "varchar"
+					},
+					{
+						"name": "Zone",
+						"type": "varchar"
+					},
+					{
+						"name": "service_zone",
+						"type": "varchar"
+					}
+				],
 				"typeProperties": {
 					"schema": "dw",
 					"table": "DimLocation"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimPaymentType')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable2')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
+					"referenceName": "AzureSynapseAnalytics1",
 					"type": "LinkedServiceReference"
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
+				"parameters": {
+					"pSchema": {
+						"type": "string"
+					},
+					"pTable": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
 				"type": "AzureSqlDWTable",
-				"schema": [],
+				"schema": [
+					{
+						"name": "CabTypeKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CabTypeID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "CabTypeDescription",
+						"type": "varchar"
+					}
+				],
 				"typeProperties": {
 					"schema": "dw",
-					"table": "DimPaymentType"
+					"table": "DimCabType"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimRate')]",
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Discovery_Parquet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
+					"referenceName": "AzureDataLakeStorage1",
 					"type": "LinkedServiceReference"
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimRate"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimTripType')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
+				"parameters": {
+					"pFileName": {
+						"type": "string"
+					}
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
+				"annotations": [],
+				"type": "Parquet",
 				"typeProperties": {
-					"schema": "dw",
-					"table": "DimTripType"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimVendor')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": "migration-test/parquet",
+						"fileSystem": "migrationcontainer"
+					},
+					"compressionCodec": "snappy"
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimVendor"
-				}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		}
 	]

@@ -21,8 +21,7 @@
 		},
 		"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:transportationsynapsemigration.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -2219,9 +2218,15 @@
 				"type": "AzureSqlDW",
 				"typeProperties": {
 					"connectionString": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultStorage')]",
