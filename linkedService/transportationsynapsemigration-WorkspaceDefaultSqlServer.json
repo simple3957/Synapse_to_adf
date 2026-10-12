@@ -11,6 +11,10 @@
 			}
 		},
 		"type": "AzureSqlDW",
-		"annotations": []
+		"annotations": [],
+		"connectVia": {
+			"referenceName": "integrationRuntime7593",
+			"type": "IntegrationRuntimeReference"
+		}
 	}
 }
