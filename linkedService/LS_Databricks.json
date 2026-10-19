@@ -22,6 +22,10 @@
 			},
 			"newClusterInitScripts": [],
 			"clusterOption": "Fixed"
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime7593",
+			"type": "IntegrationRuntimeReference"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
