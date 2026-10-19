@@ -90,9 +90,6 @@
 					"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
 						"value": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
 					},
-					"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
-						"value": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]"
-					},
 					"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
 						"value": "[parameters('transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url')]"
 					},
@@ -107,6 +104,9 @@
 					},
 					"AzureSynapseAnalytics1_properties_typeProperties_userName": {
 						"value": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_userName')]"
+					},
+					"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
+						"value": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]"
 					},
 					"Sathvik_ADF_properties_typeProperties_url": {
 						"value": "[parameters('Sathvik_ADF_properties_typeProperties_url')]"

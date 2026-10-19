@@ -23,10 +23,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'"
 		},
-		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
-			"type": "string",
-			"defaultValue": "https://workspacecr.dev.azuresynapse.net"
-		},
 		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adfteststoragebhavana.dfs.core.windows.net/"
@@ -46,6 +42,10 @@
 		"AzureSynapseAnalytics1_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "transportationmk"
+		},
+		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
+			"type": "string",
+			"defaultValue": "https://workspacecr.dev.azuresynapse.net"
 		},
 		"Sathvik_ADF_properties_typeProperties_url": {
 			"type": "string",
@@ -233,51 +233,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_Databricks')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Azure Databricks dbw-adf-migration. Job cluster per activity: single node Standard_D4ds_v5, DBR 15.4 LTS, Unity Catalog single-user (cluster policy adf-migration-single-node). Auth: factory managed identity (Contributor on the workspace).",
-				"annotations": [],
-				"type": "AzureDatabricks",
-				"typeProperties": {
-					"domain": "https://adb-7405618998257241.1.azuredatabricks.net",
-					"authentication": "MSI",
-					"workspaceResourceId": "/subscriptions/dbd817b4-9d82-42c5-85b5-8ec49b01907d/resourceGroups/adf_to_fabric/providers/Microsoft.Databricks/workspaces/dbw-adf-migration",
-					"newClusterNodeType": "Standard_D4ds_v5",
-					"newClusterNumOfWorker": "0",
-					"newClusterSparkConf": {
-						"spark.databricks.cluster.profile": "singleNode",
-						"spark.master": "local[*, 4]"
-					},
-					"newClusterCustomTags": {
-						"ResourceClass": "SingleNode",
-						"project": "adf-migration"
-					},
-					"newClusterVersion": "15.4.x-scala2.12",
-					"clusterOption": "Fixed",
-					"newClusterInitScripts": [],
-					"policyId": "0018796FECE9BEFE"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Synapse_Workspace')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSynapseArtifacts",
-				"typeProperties": {
-					"endpoint": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]",
-					"authentication": "MSI",
-					"workspaceResourceId": "/subscriptions/da8bc354-61ae-4ca3-ad35-7bb26d9a7cad/resourceGroups/RG-Synapse-sample/providers/Microsoft.Synapse/workspaces/workspacecr"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultStorage')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -360,71 +315,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_Spark_Test')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
-				"activities": [
-					{
-						"name": "Generate_CSV_And_Parque",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_Databricks",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Transform_Parquet",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "Generate_CSV_And_Parque",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Shared/adf-migration/NB_Transform_Cab_Data"
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_Databricks",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T13:54:03Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Databricks')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_Parquet_Customers')]",
@@ -554,6 +444,63 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_Databricks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Azure Databricks dbw-adf-migration. Job cluster per activity: single node Standard_D4ds_v5, DBR 15.4 LTS, Unity Catalog single-user (cluster policy adf-migration-single-node). Auth: factory managed identity (Contributor on the workspace).",
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405618998257241.1.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/dbd817b4-9d82-42c5-85b5-8ec49b01907d/resourceGroups/adf_to_fabric/providers/Microsoft.Databricks/workspaces/dbw-adf-migration",
+					"newClusterNodeType": "Standard_D4ds_v5",
+					"newClusterNumOfWorker": "0",
+					"newClusterSparkConf": {
+						"spark.databricks.cluster.profile": "singleNode",
+						"spark.master": "local[*, 4]"
+					},
+					"newClusterCustomTags": {
+						"ResourceClass": "SingleNode",
+						"project": "adf-migration"
+					},
+					"newClusterVersion": "15.4.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": [],
+					"policyId": "0018796FECE9BEFE"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Synapse_Workspace')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSynapseArtifacts",
+				"typeProperties": {
+					"endpoint": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/da8bc354-61ae-4ca3-ad35-7bb26d9a7cad/resourceGroups/RG-Synapse-sample/providers/Microsoft.Synapse/workspaces/workspacecr"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Sathvik_ADF')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -598,6 +545,71 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Spark_Test')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
+				"activities": [
+					{
+						"name": "Generate_CSV_And_Parque",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Transform_Parquet",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Generate_CSV_And_Parque",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Shared/adf-migration/NB_Transform_Cab_Data"
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2026-09-29T13:54:03Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Databricks')]"
 			]
 		},
 		{

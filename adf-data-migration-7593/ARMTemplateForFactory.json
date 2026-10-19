@@ -2397,9 +2397,15 @@
 					"clusterOption": "Fixed",
 					"newClusterInitScripts": [],
 					"policyId": "0018796FECE9BEFE"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/LS_Synapse_Workspace')]",
@@ -2412,9 +2418,15 @@
 					"endpoint": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]",
 					"authentication": "MSI",
 					"workspaceResourceId": "/subscriptions/da8bc354-61ae-4ca3-ad35-7bb26d9a7cad/resourceGroups/RG-Synapse-sample/providers/Microsoft.Synapse/workspaces/workspacecr"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime7593",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Sathvik_ADF')]",
