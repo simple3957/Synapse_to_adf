@@ -15,6 +15,9 @@
 		},
 		"connectVia": {
 			"referenceName": "integrationRuntime7593",
+		"annotations": [],
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
 		}
 	}

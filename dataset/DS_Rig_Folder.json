@@ -1,0 +1,35 @@
+{
+	"name": "DS_Rig_Folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sathvik_ADF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [
+			"MigrationAccelerator",
+			"RigorousTest"
+		],
+		"type": "DelimitedText",
+		"parameters": {
+			"folder": {
+				"type": "string"
+			}
+		},
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().folder",
+					"type": "Expression"
+				},
+				"fileSystem": "migrationcontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

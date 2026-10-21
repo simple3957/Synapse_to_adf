@@ -1,0 +1,39 @@
+{
+	"name": "DS_Rig_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sathvik_ADF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [
+			"MigrationAccelerator",
+			"RigorousTest"
+		],
+		"type": "Parquet",
+		"parameters": {
+			"folder": {
+				"type": "string"
+			},
+			"file": {
+				"type": "string"
+			}
+		},
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().file",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().folder",
+					"type": "Expression"
+				},
+				"fileSystem": "migrationcontainer"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
