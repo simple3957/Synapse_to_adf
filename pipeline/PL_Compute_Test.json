@@ -1,0 +1,135 @@
+{
+	"name": "PL_Compute_Test",
+	"properties": {
+		"description": "Measures compute resources in ADF vs Fabric with normal activities: Set Variable, Wait, Lookup and a Copy with a fixed 4 DIUs. Writes only to migration-test/compute-test/.",
+		"activities": [
+			{
+				"name": "Set_RunLabel",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "runLabel",
+					"value": "compute-test"
+				}
+			},
+			{
+				"name": "Wait_1s",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Set_RunLabel",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			},
+			{
+				"name": "Lookup_Customers",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Wait_1s",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_CSV_Customers",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Copy_Emp_To_Parquet",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Lookup_Customers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 4,
+					"parallelCopies": 1
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_CSV_Sales",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Compute_Test_Sink",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"variables": {
+			"runLabel": {
+				"type": "String"
+			}
+		},
+		"annotations": [
+			"compute-test"
+		]
+	}
+}

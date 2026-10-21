@@ -1,19 +1,31 @@
 {
 	"name": "PL_Spark_Test",
 	"properties": {
+		"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
 		"activities": [
 			{
 				"name": "Generate_CSV_And_Parque",
-				"type": "Wait",
+				"type": "DatabricksNotebook",
 				"dependsOn": [],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_Databricks",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
 				"name": "Transform_Parquet",
-				"type": "Wait",
+				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
 						"activity": "Generate_CSV_And_Parque",
@@ -22,9 +34,20 @@
 						]
 					}
 				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"notebookPath": "/Shared/adf-migration/NB_Transform_Cab_Data"
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_Databricks",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],

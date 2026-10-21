@@ -1,0 +1,23 @@
+{
+	"name": "DS_Compute_Test_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Sathvik_ADF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [
+			"compute-test"
+		],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "emp.parquet",
+				"folderPath": "migration-test/compute-test",
+				"fileSystem": "migrationcontainer"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
