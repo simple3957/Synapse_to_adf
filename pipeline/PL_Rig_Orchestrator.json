@@ -1,0 +1,392 @@
+{
+	"name": "PL_Rig_Orchestrator",
+	"properties": {
+		"description": "Rigorous test: discover CSV files, convert each in parallel through a child pipeline, check counts and output.",
+		"annotations": [
+			"MigrationAccelerator",
+			"RigorousTest"
+		],
+		"parameters": {
+			"dstFolder": {
+				"type": "string",
+				"defaultValue": "migration-test/rigorous"
+			},
+			"minFiles": {
+				"type": "int",
+				"defaultValue": 2
+			}
+		},
+		"variables": {
+			"processed": {
+				"type": "Array"
+			},
+			"status": {
+				"type": "String"
+			},
+			"counter": {
+				"type": "String",
+				"defaultValue": "0"
+			},
+			"temp": {
+				"type": "String"
+			}
+		},
+		"activities": [
+			{
+				"name": "Get_Source_Files",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_Rig_RootFolder",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter_Csv_Files",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get_Source_Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get_Source_Files').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@and(equals(item().type, 'File'), endswith(toLower(item().name), '.csv'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach_Csv_File",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter_Csv_Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter_Csv_Files').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 4,
+					"activities": [
+						{
+							"name": "Run_File_To_Parquet",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_Rig_Child_FileToParquet",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"fileName": {
+										"value": "@item().name",
+										"type": "Expression"
+									},
+									"dstFolder": {
+										"value": "@concat(pipeline().parameters.dstFolder, '/', pipeline().RunId)",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Append_Processed",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "Run_File_To_Parquet",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"typeProperties": {
+								"variableName": "processed",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "If_Enough_Files",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "ForEach_Csv_File",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"expression": {
+						"value": "@greaterOrEquals(length(variables('processed')), pipeline().parameters.minFiles)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail_Too_Few_Files",
+							"type": "Fail",
+							"dependsOn": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('Only ', string(length(variables('processed'))), ' CSV file(s) processed')",
+									"type": "Expression"
+								},
+								"errorCode": "TOO_FEW_FILES"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set_Status_Enough",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"typeProperties": {
+								"variableName": "status",
+								"value": "enough files"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Switch_On_File_Count",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "If_Enough_Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"on": {
+						"value": "@string(length(variables('processed')))",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "2",
+							"activities": [
+								{
+									"name": "Set_Status_Two",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": "exactly two files"
+									}
+								}
+							]
+						},
+						{
+							"value": "3",
+							"activities": [
+								{
+									"name": "Set_Status_Three",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": "exactly three files"
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Set_Status_Other",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"typeProperties": {
+								"variableName": "status",
+								"value": {
+									"value": "@concat(string(length(variables('processed'))), ' files')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Until_Counter_Reaches_3",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Switch_On_File_Count",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"expression": {
+						"value": "@greaterOrEquals(int(variables('counter')), 3)",
+						"type": "Expression"
+					},
+					"timeout": "0.00:05:00",
+					"activities": [
+						{
+							"name": "Set_Temp",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"typeProperties": {
+								"variableName": "temp",
+								"value": {
+									"value": "@string(add(int(variables('counter')), 1))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set_Counter",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set_Temp",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"typeProperties": {
+								"variableName": "counter",
+								"value": {
+									"value": "@variables('temp')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get_Output_Files",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Until_Counter_Reaches_3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_Rig_Folder",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": {
+								"value": "@concat(pipeline().parameters.dstFolder, '/', pipeline().RunId)",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "If_Output_Complete",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get_Output_Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(length(activity('Get_Output_Files').output.childItems), length(variables('processed')))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail_Output_Missing",
+							"type": "Fail",
+							"dependsOn": [],
+							"typeProperties": {
+								"message": "Not every processed file has a Parquet output",
+								"errorCode": "OUTPUT_MISSING"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set_Status_Done",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"typeProperties": {
+								"variableName": "status",
+								"value": {
+									"value": "@concat('done: ', string(length(variables('processed'))), ' files verified')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

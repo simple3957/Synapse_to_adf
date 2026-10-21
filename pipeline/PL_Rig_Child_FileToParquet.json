@@ -1,0 +1,167 @@
+{
+	"name": "PL_Rig_Child_FileToParquet",
+	"properties": {
+		"description": "Rigorous test: convert one CSV to Parquet and prove no row was lost.",
+		"annotations": [
+			"MigrationAccelerator",
+			"RigorousTest"
+		],
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			},
+			"dstFolder": {
+				"type": "string"
+			}
+		},
+		"activities": [
+			{
+				"name": "Lookup_Source_Rows",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_Rig_RootCsv",
+						"type": "DatasetReference",
+						"parameters": {
+							"file": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Copy_Csv_To_Parquet",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Lookup_Source_Rows",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Rig_RootCsv",
+						"type": "DatasetReference",
+						"parameters": {
+							"file": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Rig_Parquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": {
+								"value": "@pipeline().parameters.dstFolder",
+								"type": "Expression"
+							},
+							"file": {
+								"value": "@concat(replace(pipeline().parameters.fileName, '.csv', ''), '.parquet')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false
+				}
+			},
+			{
+				"name": "If_Row_Counts_Match",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Copy_Csv_To_Parquet",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('Lookup_Source_Rows').output.count, activity('Copy_Csv_To_Parquet').output.rowsCopied)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail_Row_Count_Mismatch",
+							"type": "Fail",
+							"dependsOn": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('Rows lost converting ', pipeline().parameters.fileName)",
+									"type": "Expression"
+								},
+								"errorCode": "ROWS_LOST"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Wait_Row_Counts_OK",
+							"type": "Wait",
+							"dependsOn": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
