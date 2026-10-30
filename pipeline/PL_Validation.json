@@ -1,19 +1,186 @@
 {
 	"name": "PL_Validation",
 	"properties": {
+		"description": "Validation checkpoint: for each pair in checks, the CSV and its Parquet copy must have the same number of rows.",
 		"activities": [
 			{
-				"name": "Validation_Checkpoint",
-				"type": "Wait",
+				"name": "ForEach_Check",
+				"type": "ForEach",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"items": {
+						"value": "@pipeline().parameters.checks",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Count_Csv_Rows",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"dataset": {
+									"referenceName": "DS_Check_Csv",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder": {
+											"value": "@item().csvFolder",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@item().csvFile",
+											"type": "Expression"
+										}
+									}
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "Count_Parquet_Rows",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ParquetSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": false
+									}
+								},
+								"dataset": {
+									"referenceName": "DS_Rig_Parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder": {
+											"value": "@item().parquetFolder",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@item().parquetFile",
+											"type": "Expression"
+										}
+									}
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "If_Counts_Match",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Count_Csv_Rows",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Count_Parquet_Rows",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(activity('Count_Csv_Rows').output.count, activity('Count_Parquet_Rows').output.count)",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Set_Check_Status",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "status",
+											"value": {
+												"value": "@concat(item().name, ': row counts match')",
+												"type": "Expression"
+											}
+										}
+									}
+								],
+								"ifFalseActivities": [
+									{
+										"name": "Fail_Count_Mismatch",
+										"type": "Fail",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"message": {
+												"value": "@concat(item().name, ': CSV has ', string(activity('Count_Csv_Rows').output.count), ' rows, Parquet has ', string(activity('Count_Parquet_Rows').output.count))",
+												"type": "Expression"
+											},
+											"errorCode": "ROW_COUNT_MISMATCH"
+										}
+									}
+								]
+							}
+						}
+					]
 				}
 			}
 		],
-		"annotations": [],
-		"lastPublishTime": "2026-09-29T11:37:44Z"
+		"parameters": {
+			"checks": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"name": "customers",
+						"csvFolder": "migration-test/csv/customers",
+						"csvFile": "customers.csv",
+						"parquetFolder": "migration-test/parquet/customers",
+						"parquetFile": "customers.parquet"
+					},
+					{
+						"name": "sales",
+						"csvFolder": "migration-test/csv/sales",
+						"csvFile": "sales.csv",
+						"parquetFolder": "migration-test/parquet/sales",
+						"parquetFile": "sales.parquet"
+					}
+				]
+			}
+		},
+		"variables": {
+			"status": {
+				"type": "String"
+			}
+		},
+		"annotations": [
+			"MigrationAccelerator",
+			"WaitReplacement"
+		]
 	},
-	"type": "Microsoft.Synapse/workspaces/pipelines"
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

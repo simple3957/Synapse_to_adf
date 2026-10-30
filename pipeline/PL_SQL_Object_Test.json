@@ -1,19 +1,135 @@
 {
 	"name": "PL_SQL_Object_Test",
 	"properties": {
+		"description": "Object inventory: lists the table folders under objectFolder and checks there are at least minObjects.",
 		"activities": [
 			{
-				"name": "SQL_Object_Assessment",
-				"type": "Wait",
+				"name": "List_Lake_Objects",
+				"type": "GetMetadata",
 				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"dataset": {
+						"referenceName": "DS_Rig_Folder",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": {
+								"value": "@pipeline().parameters.objectFolder",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter_Object_Folders",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "List_Lake_Objects",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('List_Lake_Objects').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().type, 'Folder')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "If_Enough_Objects",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Filter_Object_Folders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greaterOrEquals(length(activity('Filter_Object_Folders').output.value), pipeline().parameters.minObjects)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Set_Object_Status",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "status",
+								"value": {
+									"value": "@concat(string(length(activity('Filter_Object_Folders').output.value)), ' objects found')",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifFalseActivities": [
+						{
+							"name": "Fail_Too_Few_Objects",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('Only ', string(length(activity('Filter_Object_Folders').output.value)), ' object(s) in ', pipeline().parameters.objectFolder)",
+									"type": "Expression"
+								},
+								"errorCode": "TOO_FEW_OBJECTS"
+							}
+						}
+					]
 				}
 			}
 		],
-		"annotations": [],
-		"lastPublishTime": "2026-09-29T11:37:21Z"
+		"parameters": {
+			"objectFolder": {
+				"type": "string",
+				"defaultValue": "migration-test/parquet"
+			},
+			"minObjects": {
+				"type": "int",
+				"defaultValue": 1
+			}
+		},
+		"variables": {
+			"status": {
+				"type": "String"
+			}
+		},
+		"annotations": [
+			"MigrationAccelerator",
+			"WaitReplacement"
+		]
 	},
-	"type": "Microsoft.Synapse/workspaces/pipelines"
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

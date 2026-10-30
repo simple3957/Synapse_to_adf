@@ -1,19 +1,141 @@
 {
 	"name": "PL_Serverless_Test",
 	"properties": {
+		"description": "Serverless-style read: reads the customers and sales Parquet files in place; each needs at least minRows rows.",
 		"activities": [
 			{
-				"name": "Serverless_Assessment",
-				"type": "Wait",
+				"name": "Read_Customers_Parquet",
+				"type": "Lookup",
 				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_Rig_Parquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": "migration-test/parquet/customers",
+							"file": "customers.parquet"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Read_Sales_Parquet",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_Rig_Parquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": "migration-test/parquet/sales",
+							"file": "sales.parquet"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "If_Files_Have_Rows",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Read_Customers_Parquet",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Read_Sales_Parquet",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@and(greaterOrEquals(activity('Read_Customers_Parquet').output.count, pipeline().parameters.minRows), greaterOrEquals(activity('Read_Sales_Parquet').output.count, pipeline().parameters.minRows))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Set_Read_Status",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "status",
+								"value": {
+									"value": "@concat('customers ', string(activity('Read_Customers_Parquet').output.count), ', sales ', string(activity('Read_Sales_Parquet').output.count))",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifFalseActivities": [
+						{
+							"name": "Fail_Too_Few_Rows",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('A Parquet file has fewer than ', string(pipeline().parameters.minRows), ' rows')",
+									"type": "Expression"
+								},
+								"errorCode": "TOO_FEW_ROWS"
+							}
+						}
+					]
 				}
 			}
 		],
-		"annotations": [],
-		"lastPublishTime": "2026-09-29T11:37:33Z"
+		"parameters": {
+			"minRows": {
+				"type": "int",
+				"defaultValue": 1
+			}
+		},
+		"variables": {
+			"status": {
+				"type": "String"
+			}
+		},
+		"annotations": [
+			"MigrationAccelerator",
+			"WaitReplacement"
+		]
 	},
-	"type": "Microsoft.Synapse/workspaces/pipelines"
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }
