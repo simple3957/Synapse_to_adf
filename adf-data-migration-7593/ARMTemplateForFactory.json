@@ -11,37 +11,13 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
 		},
-		"AzureSynapseAnalytics1_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'AzureSynapseAnalytics1'"
-		},
 		"Sathvik_ADF_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Sathvik_ADF'"
 		},
-		"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'"
-		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"AzureSynapseAnalytics1_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "transportationmigration.sql.azuresynapse.net"
-		},
-		"AzureSynapseAnalytics1_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "transportationdedicated"
-		},
-		"AzureSynapseAnalytics1_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "transportationmk"
-		},
-		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
-			"type": "string",
-			"defaultValue": "https://workspacecr.dev.azuresynapse.net"
 		},
 		"Sathvik_ADF_properties_typeProperties_url": {
 			"type": "string",
@@ -662,180 +638,18 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_MigrationMaster')]",
+			"name": "[concat(parameters('factoryName'), '/PL_Rig_Child_FileToParquet')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Master orchestration pipeline for the Synapse to Fabric migration accelerator ecosystem.",
+				"description": "Rigorous test: convert one CSV to Parquet and prove no row was lost.",
 				"activities": [
 					{
-						"name": "Run_SQL_Object_Assessment",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_SQL_Object_Test",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Run_SQL_Data_Assessment",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Run_SQL_Object_Assessment",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_SQL_Data_Assessment",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Run_Serverless_Assessment",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Run_SQL_Data_Assessment",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_Serverless_Test",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Run_Spark_Assessment",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Run_Serverless_Assessment",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_Spark_Test",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Run_SQL_Data_Validation",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Run_Spark_Assessment",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_SQL_Data_Validation",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Run_Final_Validation",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Run_SQL_Data_Validation",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_Validation",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"MasterOrchestration"
-				],
-				"lastPublishTime": "2026-09-30T06:08:59Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/PL_SQL_Object_Test')]",
-				"[concat(variables('factoryId'), '/pipelines/PL_SQL_Data_Assessment')]",
-				"[concat(variables('factoryId'), '/pipelines/PL_Serverless_Test')]",
-				"[concat(variables('factoryId'), '/pipelines/PL_Spark_Test')]",
-				"[concat(variables('factoryId'), '/pipelines/PL_SQL_Data_Validation')]",
-				"[concat(variables('factoryId'), '/pipelines/PL_Validation')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_SQLPool_To_ADLS_Discovery')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
+						"name": "Lookup_Source_Rows",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
-							"timeout": "0.12:00:00",
+							"timeout": "0.00:10:00",
 							"retry": 0,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
@@ -844,97 +658,139 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "SqlDWSource",
-								"sqlReaderQuery": "SELECT\n    s.name AS TABLE_SCHEMA,\n    o.name AS TABLE_NAME,\n    o.type_desc AS OBJECT_TYPE\nFROM sys.objects o\nINNER JOIN sys.schemas s\n    ON o.schema_id = s.schema_id\nWHERE o.type IN ('U', 'V', 'ET')\nORDER BY s.name, o.name;",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
 							},
 							"dataset": {
-								"referenceName": "AzureSynapseAnalyticsTable1",
+								"referenceName": "DS_Rig_RootCsv",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"file": {
+										"value": "@pipeline().parameters.fileName",
+										"type": "Expression"
+									}
+								}
 							},
 							"firstRowOnly": false
 						}
 					},
 					{
-						"name": "ForEach1",
-						"type": "ForEach",
+						"name": "Copy_Csv_To_Parquet",
+						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Lookup1",
+								"activity": "Lookup_Source_Rows",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_Rig_RootCsv",
+								"type": "DatasetReference",
+								"parameters": {
+									"file": {
+										"value": "@pipeline().parameters.fileName",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Rig_Parquet",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder": {
+										"value": "@pipeline().parameters.dstFolder",
+										"type": "Expression"
+									},
+									"file": {
+										"value": "@concat(replace(pipeline().parameters.fileName, '.csv', ''), '.parquet')",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "If_Row_Counts_Match",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Copy_Csv_To_Parquet",
+								"dependencyConditions": [
+									"Succeeded"
 								]
 							}
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
+							"expression": {
+								"value": "@equals(activity('Lookup_Source_Rows').output.count, activity('Copy_Csv_To_Parquet').output.rowsCopied)",
 								"type": "Expression"
 							},
-							"activities": [
+							"ifFalseActivities": [
 								{
-									"name": "Copy data1",
-									"type": "Copy",
+									"name": "Fail_Row_Count_Mismatch",
+									"type": "Fail",
 									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
 									"userProperties": [],
 									"typeProperties": {
-										"source": {
-											"type": "SqlDWSource",
-											"sqlReaderQuery": {
-												"value": "@concat(\n'SELECT * FROM [',\nitem().TABLE_SCHEMA,\n'].[',\nitem().TABLE_NAME,\n']'\n)",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
+										"message": {
+											"value": "@concat('Rows lost converting ', pipeline().parameters.fileName)",
+											"type": "Expression"
 										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "AzureSynapseAnalyticsTable2",
-											"type": "DatasetReference",
-											"parameters": {
-												"pSchema": "@item().TABLE_SCHEMA",
-												"pTable": "@item().TABLE_NAME"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DS_ADLS_Discovery_Parquet",
-											"type": "DatasetReference",
-											"parameters": {
-												"pFileName": "@concat(item().TABLE_SCHEMA, '_', item().TABLE_NAME, '.parquet')"
-											}
-										}
-									]
+										"errorCode": "ROWS_LOST"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Wait_Row_Counts_OK",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 1
+									}
 								}
 							]
 						}
@@ -943,448 +799,474 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": []
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"dstFolder": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"RigorousTest"
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable2')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ADLS_Discovery_Parquet')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_RootCsv')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_Parquet')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_SQL_Data_Assessment')]",
+			"name": "[concat(parameters('factoryName'), '/PL_Rig_Orchestrator')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Assess real TransportDW SQL objects used by the Synapse migration accelerator.",
+				"description": "Rigorous test: discover CSV files, convert each in parallel through a child pipeline, check counts and output.",
 				"activities": [
 					{
-						"name": "Count_NYCCabTrip_Green",
-						"type": "Lookup",
+						"name": "Get_Source_Files",
+						"type": "GetMetadata",
 						"dependsOn": [],
 						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
+							"timeout": "0.00:10:00",
+							"retry": 0,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'stage.NYCCabTrip_Green' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [stage].[NYCCabTrip_Green]",
-								"partitionOption": "None"
-							},
 							"dataset": {
-								"referenceName": "DS_SQL_NYCCabTrip_Green",
+								"referenceName": "DS_Rig_RootFolder",
 								"type": "DatasetReference",
 								"parameters": {}
 							},
-							"firstRowOnly": true
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
 						}
 					},
 					{
-						"name": "Count_NYCCabTrip_Yellow",
-						"type": "Lookup",
+						"name": "Filter_Csv_Files",
+						"type": "Filter",
 						"dependsOn": [
 							{
-								"activity": "Count_NYCCabTrip_Green",
+								"activity": "Get_Source_Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get_Source_Files').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@and(equals(item().type, 'File'), endswith(toLower(item().name), '.csv'))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach_Csv_File",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter_Csv_Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter_Csv_Files').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 4,
+							"activities": [
+								{
+									"name": "Run_File_To_Parquet",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PL_Rig_Child_FileToParquet",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"fileName": {
+												"value": "@item().name",
+												"type": "Expression"
+											},
+											"dstFolder": {
+												"value": "@concat(pipeline().parameters.dstFolder, '/', pipeline().RunId)",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Append_Processed",
+									"type": "AppendVariable",
+									"dependsOn": [
+										{
+											"activity": "Run_File_To_Parquet",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "processed",
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "If_Enough_Files",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "ForEach_Csv_File",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greaterOrEquals(length(variables('processed')), pipeline().parameters.minFiles)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Fail_Too_Few_Files",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('Only ', string(length(variables('processed'))), ' CSV file(s) processed')",
+											"type": "Expression"
+										},
+										"errorCode": "TOO_FEW_FILES"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Set_Status_Enough",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": "enough files"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Switch_On_File_Count",
+						"type": "Switch",
+						"dependsOn": [
+							{
+								"activity": "If_Enough_Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@string(length(variables('processed')))",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "2",
+									"activities": [
+										{
+											"name": "Set_Status_Two",
+											"type": "SetVariable",
+											"dependsOn": [],
+											"policy": {
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"variableName": "status",
+												"value": "exactly two files"
+											}
+										}
+									]
+								},
+								{
+									"value": "3",
+									"activities": [
+										{
+											"name": "Set_Status_Three",
+											"type": "SetVariable",
+											"dependsOn": [],
+											"policy": {
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"variableName": "status",
+												"value": "exactly three files"
+											}
+										}
+									]
+								}
+							],
+							"defaultActivities": [
+								{
+									"name": "Set_Status_Other",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": {
+											"value": "@concat(string(length(variables('processed'))), ' files')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Until_Counter_Reaches_3",
+						"type": "Until",
+						"dependsOn": [
+							{
+								"activity": "Switch_On_File_Count",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greaterOrEquals(int(variables('counter')), 3)",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Set_Temp",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "temp",
+										"value": {
+											"value": "@string(add(int(variables('counter')), 1))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set_Counter",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Set_Temp",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "counter",
+										"value": {
+											"value": "@variables('temp')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"timeout": "0.00:05:00"
+						}
+					},
+					{
+						"name": "Get_Output_Files",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Until_Counter_Reaches_3",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							}
 						],
 						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
+							"timeout": "0.00:10:00",
+							"retry": 0,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'stage.NYCCabTrip_Yellow' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [stage].[NYCCabTrip_Yellow]",
-								"partitionOption": "None"
-							},
 							"dataset": {
-								"referenceName": "DS_SQL_NYCCabTrip_Yellow",
+								"referenceName": "DS_Rig_Folder",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"folder": {
+										"value": "@concat(pipeline().parameters.dstFolder, '/', pipeline().RunId)",
+										"type": "Expression"
+									}
+								}
 							},
-							"firstRowOnly": true
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
 						}
 					},
 					{
-						"name": "Count_DimCabType",
-						"type": "Lookup",
+						"name": "If_Output_Complete",
+						"type": "IfCondition",
 						"dependsOn": [
 							{
-								"activity": "Count_NYCCabTrip_Yellow",
+								"activity": "Get_Output_Files",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							}
 						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.DimCabType' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[DimCabType]",
-								"partitionOption": "None"
+							"expression": {
+								"value": "@equals(length(activity('Get_Output_Files').output.childItems), length(variables('processed')))",
+								"type": "Expression"
 							},
-							"dataset": {
-								"referenceName": "DS_SQL_DimCabType",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Count_DimLocation",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Count_DimCabType",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.DimLocation' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[DimLocation]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_DimLocation",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Count_DimPaymentType",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Count_DimLocation",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.DimPaymentType' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[DimPaymentType]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_DimPaymentType",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Count_DimRate",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Count_DimPaymentType",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.DimRate' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[DimRate]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_DimRate",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Count_DimTripType",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Count_DimRate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.DimTripType' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[DimTripType]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_DimTripType",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Count_DimVendor",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Count_DimTripType",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.DimVendor' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[DimVendor]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_DimVendor",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Count_FactCabTrip",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Count_DimVendor",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT 'dw.FactCabTrip' AS ObjectName, COUNT_BIG(*) AS RowCount FROM [dw].[FactCabTrip]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_FactCabTrip",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
+							"ifFalseActivities": [
+								{
+									"name": "Fail_Output_Missing",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": "Not every processed file has a Parquet output",
+										"errorCode": "OUTPUT_MISSING"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Set_Status_Done",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": {
+											"value": "@concat('done: ', string(length(variables('processed'))), ' files verified')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"RealSQLAssessment"
-				],
-				"lastPublishTime": "2026-09-30T06:01:21Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_NYCCabTrip_Green')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_NYCCabTrip_Yellow')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_DimCabType')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_DimLocation')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_DimPaymentType')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_DimRate')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_DimTripType')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_DimVendor')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_FactCabTrip')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_SQL_Data_Validation')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Validate row counts and connectivity across TransportDW staging and warehouse tables.",
-				"activities": [
-					{
-						"name": "Validate_Stage_Green",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT COUNT_BIG(*) AS GreenRowCount FROM [stage].[NYCCabTrip_Green]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_NYCCabTrip_Green",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
+				"parameters": {
+					"dstFolder": {
+						"type": "string",
+						"defaultValue": "migration-test/rigorous"
 					},
-					{
-						"name": "Validate_Stage_Yellow",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Validate_Stage_Green",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT COUNT_BIG(*) AS YellowRowCount FROM [stage].[NYCCabTrip_Yellow]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_NYCCabTrip_Yellow",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "Validate_Fact",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Validate_Stage_Yellow",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT COUNT_BIG(*) AS FactRowCount FROM [dw].[FactCabTrip]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_SQL_FactCabTrip",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
+					"minFiles": {
+						"type": "int",
+						"defaultValue": 2
 					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"processed": {
+						"type": "Array"
+					},
+					"status": {
+						"type": "String"
+					},
+					"counter": {
+						"type": "String",
+						"defaultValue": "0"
+					},
+					"temp": {
+						"type": "String"
+					}
 				},
 				"annotations": [
 					"MigrationAccelerator",
-					"TransportDW",
-					"Validation"
-				],
-				"lastPublishTime": "2026-09-30T06:02:02Z"
+					"RigorousTest"
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_NYCCabTrip_Green')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_NYCCabTrip_Yellow')]",
-				"[concat(variables('factoryId'), '/datasets/DS_SQL_FactCabTrip')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_RootFolder')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_Folder')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_Rig_Child_FileToParquet')]"
 			]
 		},
 		{
@@ -1392,48 +1274,298 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Object inventory: lists the table folders under objectFolder and checks there are at least minObjects.",
 				"activities": [
 					{
-						"name": "SQL_Object_Assessment",
-						"type": "Wait",
+						"name": "List_Lake_Objects",
+						"type": "GetMetadata",
 						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 1
+							"dataset": {
+								"referenceName": "DS_Rig_Folder",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder": {
+										"value": "@pipeline().parameters.objectFolder",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter_Object_Folders",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "List_Lake_Objects",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('List_Lake_Objects').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'Folder')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "If_Enough_Objects",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Filter_Object_Folders",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greaterOrEquals(length(activity('Filter_Object_Folders').output.value), pipeline().parameters.minObjects)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Fail_Too_Few_Objects",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('Only ', string(length(activity('Filter_Object_Folders').output.value)), ' object(s) in ', pipeline().parameters.objectFolder)",
+											"type": "Expression"
+										},
+										"errorCode": "TOO_FEW_OBJECTS"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Set_Object_Status",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": {
+											"value": "@concat(string(length(activity('Filter_Object_Folders').output.value)), ' objects found')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T11:37:21Z"
+				"parameters": {
+					"objectFolder": {
+						"type": "string",
+						"defaultValue": "migration-test/parquet"
+					},
+					"minObjects": {
+						"type": "int",
+						"defaultValue": 1
+					}
+				},
+				"variables": {
+					"status": {
+						"type": "String"
+					}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"WaitReplacement"
+				]
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_Folder')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PL_Serverless_Test')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Serverless-style read: reads the customers and sales Parquet files in place; each needs at least minRows rows.",
 				"activities": [
 					{
-						"name": "Serverless_Assessment",
-						"type": "Wait",
+						"name": "Read_Customers_Parquet",
+						"type": "Lookup",
 						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 1
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": false
+								}
+							},
+							"dataset": {
+								"referenceName": "DS_Rig_Parquet",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder": "migration-test/parquet/customers",
+									"file": "customers.parquet"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Read_Sales_Parquet",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": false
+								}
+							},
+							"dataset": {
+								"referenceName": "DS_Rig_Parquet",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder": "migration-test/parquet/sales",
+									"file": "sales.parquet"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "If_Files_Have_Rows",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Read_Customers_Parquet",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Read_Sales_Parquet",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@and(greaterOrEquals(activity('Read_Customers_Parquet').output.count, pipeline().parameters.minRows), greaterOrEquals(activity('Read_Sales_Parquet').output.count, pipeline().parameters.minRows))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Fail_Too_Few_Rows",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('A Parquet file has fewer than ', string(pipeline().parameters.minRows), ' rows')",
+											"type": "Expression"
+										},
+										"errorCode": "TOO_FEW_ROWS"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Set_Read_Status",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "status",
+										"value": {
+											"value": "@concat('customers ', string(activity('Read_Customers_Parquet').output.count), ', sales ', string(activity('Read_Sales_Parquet').output.count))",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T11:37:33Z"
+				"parameters": {
+					"minRows": {
+						"type": "int",
+						"defaultValue": 1
+					}
+				},
+				"variables": {
+					"status": {
+						"type": "String"
+					}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"WaitReplacement"
+				]
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_Parquet')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PL_Spark_Test')]",
@@ -1505,111 +1637,197 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Validation checkpoint: for each pair in checks, the CSV and its Parquet copy must have the same number of rows.",
 				"activities": [
 					{
-						"name": "Validation_Checkpoint",
-						"type": "Wait",
+						"name": "ForEach_Check",
+						"type": "ForEach",
 						"dependsOn": [],
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 1
+							"items": {
+								"value": "@pipeline().parameters.checks",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Count_Csv_Rows",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"dataset": {
+											"referenceName": "DS_Check_Csv",
+											"type": "DatasetReference",
+											"parameters": {
+												"folder": {
+													"value": "@item().csvFolder",
+													"type": "Expression"
+												},
+												"file": {
+													"value": "@item().csvFile",
+													"type": "Expression"
+												}
+											}
+										},
+										"firstRowOnly": false
+									}
+								},
+								{
+									"name": "Count_Parquet_Rows",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ParquetSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": false
+											}
+										},
+										"dataset": {
+											"referenceName": "DS_Rig_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"folder": {
+													"value": "@item().parquetFolder",
+													"type": "Expression"
+												},
+												"file": {
+													"value": "@item().parquetFile",
+													"type": "Expression"
+												}
+											}
+										},
+										"firstRowOnly": false
+									}
+								},
+								{
+									"name": "If_Counts_Match",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Count_Csv_Rows",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Count_Parquet_Rows",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(activity('Count_Csv_Rows').output.count, activity('Count_Parquet_Rows').output.count)",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "Fail_Count_Mismatch",
+												"type": "Fail",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"message": {
+														"value": "@concat(item().name, ': CSV has ', string(activity('Count_Csv_Rows').output.count), ' rows, Parquet has ', string(activity('Count_Parquet_Rows').output.count))",
+														"type": "Expression"
+													},
+													"errorCode": "ROW_COUNT_MISMATCH"
+												}
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "Set_Check_Status",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "status",
+													"value": {
+														"value": "@concat(item().name, ': row counts match')",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								}
+							]
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T11:37:44Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSynapseAnalytics1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "LocationKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "LocationID",
-						"type": "smallint",
-						"precision": 5
-					},
-					{
-						"name": "Borough",
-						"type": "varchar"
-					},
-					{
-						"name": "Zone",
-						"type": "varchar"
-					},
-					{
-						"name": "service_zone",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimLocation"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable2')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSynapseAnalytics1",
-					"type": "LinkedServiceReference"
-				},
 				"parameters": {
-					"pSchema": {
-						"type": "string"
-					},
-					"pTable": {
-						"type": "string"
+					"checks": {
+						"type": "array",
+						"defaultValue": [
+							{
+								"name": "customers",
+								"csvFolder": "migration-test/csv/customers",
+								"csvFile": "customers.csv",
+								"parquetFolder": "migration-test/parquet/customers",
+								"parquetFile": "customers.parquet"
+							},
+							{
+								"name": "sales",
+								"csvFolder": "migration-test/csv/sales",
+								"csvFile": "sales.csv",
+								"parquetFolder": "migration-test/parquet/sales",
+								"parquetFile": "sales.parquet"
+							}
+						]
 					}
 				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "CabTypeKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CabTypeID",
-						"type": "smallint",
-						"precision": 5
-					},
-					{
-						"name": "CabTypeDescription",
-						"type": "varchar"
+				"variables": {
+					"status": {
+						"type": "String"
 					}
-				],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimCabType"
-				}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"WaitReplacement"
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics1')]"
+				"[concat(variables('factoryId'), '/datasets/DS_Check_Csv')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Rig_Parquet')]"
 			]
 		},
 		{
@@ -1727,6 +1945,52 @@
 						"type": "Int64"
 					}
 				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Check_Csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folder": {
+						"type": "string"
+					},
+					"file": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"WaitReplacement"
+				],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().folder",
+							"type": "Expression"
+						},
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
@@ -1976,264 +2240,154 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimCabType')]",
+			"name": "[concat(parameters('factoryName'), '/DS_Rig_Folder')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimLocation')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimLocation"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimPaymentType')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimPaymentType"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimRate')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimRate"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimTripType')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimTripType"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DimVendor')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimVendor"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_DynamicTable')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
+					"referenceName": "Sathvik_ADF",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"SchemaName": {
-						"type": "string"
-					},
-					"TableName": {
+					"folder": {
 						"type": "string"
 					}
 				},
 				"annotations": [
 					"MigrationAccelerator",
-					"ParameterizedDataset",
-					"DynamicSQL"
+					"RigorousTest"
 				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
+				"type": "DelimitedText",
 				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().folder",
+							"type": "Expression"
+						},
+						"fileSystem": "migrationcontainer"
 					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Rig_Parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folder": {
+						"type": "string"
+					},
+					"file": {
+						"type": "string"
 					}
-				}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"RigorousTest"
+				],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().folder",
+							"type": "Expression"
+						},
+						"fileSystem": "migrationcontainer"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_FactCabTrip')]",
+			"name": "[concat(parameters('factoryName'), '/DS_Rig_RootCsv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
+					"referenceName": "Sathvik_ADF",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file": {
+						"type": "string"
+					}
 				},
 				"annotations": [
 					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
+					"RigorousTest"
 				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
+				"type": "DelimitedText",
 				"typeProperties": {
-					"schema": "dw",
-					"table": "FactCabTrip"
-				}
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file",
+							"type": "Expression"
+						},
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_NYCCabTrip_Green')]",
+			"name": "[concat(parameters('factoryName'), '/DS_Rig_RootFolder')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
+					"referenceName": "Sathvik_ADF",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [
 					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
+					"RigorousTest"
 				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
+				"type": "DelimitedText",
 				"typeProperties": {
-					"schema": "stage",
-					"table": "NYCCabTrip_Green"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_SQL_NYCCabTrip_Yellow')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
 				},
-				"annotations": [
-					"MigrationAccelerator",
-					"TransportDW",
-					"DedicatedSQL"
-				],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "stage",
-					"table": "NYCCabTrip_Yellow"
-				}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultSqlServer')]"
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
 			]
 		},
 		{
@@ -2344,34 +2498,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalytics1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"server": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_server')]",
-					"database": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('AzureSynapseAnalytics1_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/LS_Databricks')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -2408,27 +2534,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_Synapse_Workspace')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSynapseArtifacts",
-				"typeProperties": {
-					"endpoint": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]",
-					"authentication": "MSI",
-					"workspaceResourceId": "/subscriptions/da8bc354-61ae-4ca3-ad35-7bb26d9a7cad/resourceGroups/RG-Synapse-sample/providers/Microsoft.Synapse/workspaces/workspacecr"
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Sathvik_ADF')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -2452,30 +2557,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultSqlServer')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"DBName": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"connectionString": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultStorage')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -2487,36 +2568,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TR_Schedule_MigrationTest')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "PL_MigrationMaster",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2026-01-01T00:00:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/PL_MigrationMaster')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",

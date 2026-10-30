@@ -11,17 +11,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
 		},
-		"AzureSynapseAnalytics1_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'AzureSynapseAnalytics1'"
-		},
 		"Sathvik_ADF_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Sathvik_ADF'"
-		},
-		"transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'transportationsynapsemigration-WorkspaceDefaultSqlServer'"
 		},
 		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
@@ -30,22 +22,6 @@
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"AzureSynapseAnalytics1_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "transportationmigration.sql.azuresynapse.net"
-		},
-		"AzureSynapseAnalytics1_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "transportationdedicated"
-		},
-		"AzureSynapseAnalytics1_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "transportationmk"
-		},
-		"LS_Synapse_Workspace_properties_typeProperties_endpoint": {
-			"type": "string",
-			"defaultValue": "https://workspacecr.dev.azuresynapse.net"
 		},
 		"Sathvik_ADF_properties_typeProperties_url": {
 			"type": "string",
@@ -157,78 +133,6 @@
 				"annotations": [
 					"ADFTest"
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_SQL_Object_Test')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "SQL_Object_Assessment",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T11:37:21Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_Serverless_Test')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Serverless_Assessment",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T11:37:33Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_Validation')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Validation_Checkpoint",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T11:37:44Z"
 			},
 			"dependsOn": []
 		},
@@ -416,34 +320,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalytics1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"server": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_server')]",
-					"database": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('AzureSynapseAnalytics1_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('AzureSynapseAnalytics1_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/LS_Databricks')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -480,27 +356,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_Synapse_Workspace')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSynapseArtifacts",
-				"typeProperties": {
-					"endpoint": "[parameters('LS_Synapse_Workspace_properties_typeProperties_endpoint')]",
-					"authentication": "MSI",
-					"workspaceResourceId": "/subscriptions/da8bc354-61ae-4ca3-ad35-7bb26d9a7cad/resourceGroups/RG-Synapse-sample/providers/Microsoft.Synapse/workspaces/workspacecr"
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Sathvik_ADF')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -513,30 +368,6 @@
 						"type": "SecureString",
 						"value": "[parameters('Sathvik_ADF_accountKey')]"
 					}
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultSqlServer')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"DBName": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"connectionString": "[parameters('transportationsynapsemigration-WorkspaceDefaultSqlServer_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "integrationRuntime7593",
@@ -613,91 +444,293 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Discovery_Parquet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureSynapseAnalytics1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "LocationKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "LocationID",
-						"type": "smallint",
-						"precision": 5
-					},
-					{
-						"name": "Borough",
-						"type": "varchar"
-					},
-					{
-						"name": "Zone",
-						"type": "varchar"
-					},
-					{
-						"name": "service_zone",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dw",
-					"table": "DimLocation"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable2')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSynapseAnalytics1",
+					"referenceName": "AzureDataLakeStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"pSchema": {
-						"type": "string"
-					},
-					"pTable": {
+					"pFileName": {
 						"type": "string"
 					}
 				},
 				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "CabTypeKey",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CabTypeID",
-						"type": "smallint",
-						"precision": 5
-					},
-					{
-						"name": "CabTypeDescription",
-						"type": "varchar"
-					}
-				],
+				"type": "Parquet",
 				"typeProperties": {
-					"schema": "dw",
-					"table": "DimCabType"
-				}
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": "migration-test/parquet",
+						"fileSystem": "migrationcontainer"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_CSV_Customers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.csv",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerId",
+						"type": "String"
+					},
+					{
+						"name": "CustomerName",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_CSV_Sales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "emp.csv",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "SaleId",
+						"type": "String"
+					},
+					{
+						"name": "CustomerId",
+						"type": "String"
+					},
+					{
+						"name": "Product",
+						"type": "String"
+					},
+					{
+						"name": "Amount",
+						"type": "Int64"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Check_Csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folder": {
+						"type": "string"
+					},
+					"file": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"MigrationAccelerator",
+					"WaitReplacement"
+				],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().folder",
+							"type": "Expression"
+						},
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Compute_Test_Sink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [
+					"compute-test"
+				],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "emp.parquet",
+						"folderPath": "migration-test/compute-test",
+						"fileSystem": "migrationcontainer"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Customers_CSV_Sink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "customers.csv",
+						"folderPath": "migration-test/csv/customers",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Customers_CSV_Source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.csv",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerId",
+						"type": "String"
+					},
+					{
+						"name": "CustomerName",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Cutomers_Parquet_Sink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "customers.parquet",
+						"folderPath": "migration-test/parquet/customers",
+						"fileSystem": "migrationcontainer"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
 			]
 		}
 	]
