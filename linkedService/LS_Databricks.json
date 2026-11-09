@@ -8,23 +8,21 @@
 			"domain": "https://adb-7405618998257241.1.azuredatabricks.net",
 			"authentication": "MSI",
 			"workspaceResourceId": "/subscriptions/dbd817b4-9d82-42c5-85b5-8ec49b01907d/resourceGroups/adf_to_fabric/providers/Microsoft.Databricks/workspaces/dbw-adf-migration",
-			"policyId": "0018796FECE9BEFE",
 			"newClusterNodeType": "Standard_D4ds_v5",
-			"newClusterNumOfWorker": "0",
-			"newClusterVersion": "15.4.x-scala2.12",
+			"newClusterNumOfWorker": "1:2",
 			"newClusterSparkConf": {
-				"spark.databricks.cluster.profile": "singleNode",
 				"spark.master": "local[*, 4]"
 			},
 			"newClusterCustomTags": {
-				"ResourceClass": "SingleNode",
 				"project": "adf-migration"
 			},
+			"newClusterVersion": "15.4.x-scala2.12",
+			"clusterOption": "Autoscaling",
 			"newClusterInitScripts": [],
-			"clusterOption": "Fixed"
+			"policyId": "0018796FECE9BEFE"
 		},
 		"connectVia": {
-			"referenceName": "integrationRuntime7593",
+			"referenceName": "AzureIRMigrationTesting",
 			"type": "IntegrationRuntimeReference"
 		}
 	},
