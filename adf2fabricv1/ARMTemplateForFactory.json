@@ -1587,31 +1587,11 @@
 				"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
 				"activities": [
 					{
-						"name": "Generate_CSV_And_Parque",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureDatabricks1",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
 						"name": "Transform_Parquet",
 						"type": "DatabricksNotebook",
 						"dependsOn": [
 							{
-								"activity": "Generate_CSV_And_Parque",
+								"activity": "Job1",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -1632,6 +1612,26 @@
 							"referenceName": "LS_Databricks",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "Job1",
+						"type": "DatabricksJob",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"jobId": "1080769789763787"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -1641,8 +1641,8 @@
 				"lastPublishTime": "2026-09-29T13:54:03Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_Databricks')]"
+				"[concat(variables('factoryId'), '/linkedServices/LS_Databricks')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
 			]
 		},
 		{
@@ -2545,12 +2545,7 @@
 					"accessToken": {
 						"type": "SecureString",
 						"value": "[parameters('AzureDatabricks1_accessToken')]"
-					},
-					"newClusterNodeType": "Standard_DS3_v2",
-					"newClusterNumOfWorker": "1",
-					"newClusterVersion": "13.3.x-scala2.12",
-					"clusterOption": "Fixed",
-					"newClusterInitScripts": []
+					}
 				},
 				"connectVia": {
 					"referenceName": "AzureIRMigrationTesting",
