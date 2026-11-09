@@ -4,7 +4,11 @@
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://adfteststoragebhavana.dfs.core.windows.net/"
+			"url": "https://storagebrr.dfs.core.windows.net/"
+		},
+		"connectVia": {
+			"referenceName": "AzureIRMigrationTesting",
+			"type": "IntegrationRuntimeReference"
 		}
 	},
 	"type": "Microsoft.Synapse/workspaces/linkedservices"
