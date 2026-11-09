@@ -1,0 +1,16 @@
+{
+	"name": "AzureDatabricks1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-7405617008097962.2.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/3bca8b73-07f7-40c8-a909-91edb4df9bb6/resourceGroups/rg_adf_to_fabric/providers/Microsoft.Databricks/workspaces/databricksbp"
+		},
+		"connectVia": {
+			"referenceName": "AzureIRMigrationTesting",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
