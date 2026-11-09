@@ -2,7 +2,7 @@
 	"name": "DS_Compute_Test_Sink",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Sathvik_ADF",
+			"referenceName": "AzureDataLakeStorage2",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [

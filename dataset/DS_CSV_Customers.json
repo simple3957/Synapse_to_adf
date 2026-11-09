@@ -2,7 +2,7 @@
 	"name": "DS_CSV_Customers",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Sathvik_ADF",
+			"referenceName": "AzureDataLakeStorage2",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
