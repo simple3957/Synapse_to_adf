@@ -476,8 +476,28 @@
 				"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
 				"activities": [
 					{
-						"name": "Transform_Parquet",
-						"type": "DatabricksNotebook",
+						"name": "Job1",
+						"type": "DatabricksJob",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"jobId": "1080769789763787"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Job2",
+						"type": "DatabricksJob",
 						"dependsOn": [
 							{
 								"activity": "Job1",
@@ -486,26 +506,6 @@
 								]
 							}
 						],
-						"policy": {
-							"timeout": "0.01:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Shared/adf-migration/NB_Transform_Cab_Data"
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_Databricks",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Job1",
-						"type": "DatabricksJob",
-						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -530,7 +530,6 @@
 				"lastPublishTime": "2026-09-29T13:54:03Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_Databricks')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
 			]
 		},
