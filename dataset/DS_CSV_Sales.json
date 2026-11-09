@@ -2,7 +2,7 @@
 	"name": "DS_CSV_Sales",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage2",
+			"referenceName": "Sathvik_ADF",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "emp.csv",
+				"fileName": "Sales.csv",
 				"fileSystem": "migrationcontainer"
 			},
 			"columnDelimiter": ",",
