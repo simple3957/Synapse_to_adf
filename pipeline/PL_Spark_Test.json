@@ -19,7 +19,7 @@
 					"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
 				},
 				"linkedServiceName": {
-					"referenceName": "LS_Databricks",
+					"referenceName": "AzureDatabricks1",
 					"type": "LinkedServiceReference"
 				}
 			},
