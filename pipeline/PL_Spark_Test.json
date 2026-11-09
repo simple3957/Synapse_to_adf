@@ -1,58 +1,61 @@
 {
 	"name": "PL_Spark_Test",
 	"properties": {
-		"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
 		"activities": [
 			{
-				"name": "Job1",
-				"type": "DatabricksJob",
 				"dependsOn": [],
+				"linkedServiceName": {
+					"referenceName": "LS_Databricks",
+					"type": "LinkedServiceReference"
+				},
+				"name": "Generate_CSV_And_Parque",
 				"policy": {
-					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
+					"secureInput": false,
 					"secureOutput": false,
-					"secureInput": false
+					"timeout": "0.01:00:00"
 				},
-				"userProperties": [],
+				"type": "DatabricksNotebook",
 				"typeProperties": {
-					"jobId": "1080769789763787"
+					"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
 				},
-				"linkedServiceName": {
-					"referenceName": "AzureDatabricks1",
-					"type": "LinkedServiceReference"
-				}
+				"userProperties": []
 			},
 			{
-				"name": "Job2",
-				"type": "DatabricksJob",
 				"dependsOn": [
 					{
-						"activity": "Job1",
+						"activity": "Generate_CSV_And_Parque",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
+				"linkedServiceName": {
+					"referenceName": "LS_Databricks",
+					"type": "LinkedServiceReference"
+				},
+				"name": "Transform_Parquet",
 				"policy": {
-					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
+					"secureInput": false,
 					"secureOutput": false,
-					"secureInput": false
+					"timeout": "0.01:00:00"
 				},
-				"userProperties": [],
+				"type": "DatabricksNotebook",
 				"typeProperties": {
-					"jobId": "1080769789763787"
+					"notebookPath": "/Shared/adf-migration/NB_Transform_Cab_Data"
 				},
-				"linkedServiceName": {
-					"referenceName": "AzureDatabricks1",
-					"type": "LinkedServiceReference"
-				}
+				"userProperties": []
 			}
 		],
 		"annotations": [],
-		"lastPublishTime": "2026-09-29T13:54:03Z"
+		"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
+		"lastPublishTime": "2026-11-09T12:52:42Z",
+		"policy": {
+			"elapsedTimeMetric": {}
+		}
 	},
 	"type": "Microsoft.Synapse/workspaces/pipelines"
 }
