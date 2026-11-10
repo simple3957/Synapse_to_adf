@@ -3,56 +3,55 @@
 	"properties": {
 		"activities": [
 			{
+				"name": "Generate_CSV_And_Parquet",
+				"type": "DatabricksJob",
 				"dependsOn": [],
-				"linkedServiceName": {
-					"referenceName": "LS_Databricks",
-					"type": "LinkedServiceReference"
-				},
-				"name": "Generate_CSV_And_Parque",
 				"policy": {
+					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureInput": false,
 					"secureOutput": false,
-					"timeout": "0.01:00:00"
+					"secureInput": false
 				},
-				"type": "DatabricksNotebook",
+				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Shared/adf-migration/NB_Read_Raw_Data"
+					"jobId": "1080769789763787"
 				},
-				"userProperties": []
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
 			},
 			{
+				"name": "Transform_Parquet",
+				"type": "DatabricksJob",
 				"dependsOn": [
 					{
-						"activity": "Generate_CSV_And_Parque",
+						"activity": "Generate_CSV_And_Parquet",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
-				"linkedServiceName": {
-					"referenceName": "LS_Databricks",
-					"type": "LinkedServiceReference"
-				},
-				"name": "Transform_Parquet",
 				"policy": {
+					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureInput": false,
 					"secureOutput": false,
-					"timeout": "0.01:00:00"
+					"secureInput": false
 				},
-				"type": "DatabricksNotebook",
+				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Shared/adf-migration/NB_Transform_Cab_Data"
+					"jobId": "624224332531621"
 				},
-				"userProperties": []
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"annotations": [],
-		"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
-		"lastPublishTime": "2026-11-09T12:52:42Z",
+		"description": "Runs the two Spark notebooks as Databricks jobs on serverless compute (the workspace is serverless-only): NB_Read_Raw_Data, then NB_Transform_Cab_Data.",
 		"policy": {
 			"elapsedTimeMetric": {}
 		}
