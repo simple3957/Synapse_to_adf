@@ -1,30 +1,28 @@
 {
 	"name": "LS_Databricks",
 	"properties": {
+		"description": "Azure Databricks dbw-adf-migration. Job cluster per activity: single node Standard_D4ds_v5, DBR 15.4 LTS, Unity Catalog single-user (cluster policy adf-migration-single-node). Auth: factory managed identity (Contributor on the workspace).",
 		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-7405617008097962.2.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/3bca8b73-07f7-40c8-a909-91edb4df9bb6/resourceGroups/rg_adf_to_fabric/providers/Microsoft.Databricks/workspaces/databricksbp",
+			"newClusterNodeType": "Standard_D4ds_v5",
+			"newClusterNumOfWorker": "1",
+			"newClusterSparkConf": {
+				"spark.master": "local[*, 4]"
+			},
+			"newClusterCustomTags": {
+				"project": "adf-migration"
+			},
+			"newClusterVersion": "15.4.x-scala2.12",
+			"clusterOption": "Fixed",
+			"newClusterInitScripts": []
+		},
 		"connectVia": {
 			"referenceName": "AzureIRMigrationTesting",
 			"type": "IntegrationRuntimeReference"
-		},
-		"description": "Azure Databricks dbw-adf-migration. Job cluster per activity: single node Standard_D4ds_v5, DBR 15.4 LTS, Unity Catalog single-user (cluster policy adf-migration-single-node). Auth: factory managed identity (Contributor on the workspace).",
-		"type": "AzureDatabricks",
-		"typeProperties": {
-			"authentication": "MSI",
-			"clusterOption": "Fixed",
-			"domain": "https://adb-7405617008097962.2.azuredatabricks.net",
-			"newClusterCustomTags": {
-				"ResourceClass": "SingleNode",
-				"project": "adf-migration"
-			},
-			"newClusterInitScripts": [],
-			"newClusterNodeType": "Standard_D4ds_v5",
-			"newClusterNumOfWorker": "0",
-			"newClusterSparkConf": {
-				"spark.databricks.cluster.profile": "singleNode",
-				"spark.master": "local[*, 4]"
-			},
-			"newClusterVersion": "15.4.x-scala2.12",
-			"workspaceResourceId": "/subscriptions/3bca8b73-07f7-40c8-a909-91edb4df9bb6/resourceGroups/rg_adf_to_fabric/providers/Microsoft.Databricks/workspaces/databricksbp"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
