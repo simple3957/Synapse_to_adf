@@ -9,7 +9,7 @@
 			"authentication": "MSI",
 			"workspaceResourceId": "/subscriptions/3bca8b73-07f7-40c8-a909-91edb4df9bb6/resourceGroups/rg_adf_to_fabric/providers/Microsoft.Databricks/workspaces/databricksbp",
 			"newClusterNodeType": "Standard_D4ds_v5",
-			"newClusterNumOfWorker": "0",
+			"newClusterNumOfWorker": "1",
 			"newClusterSparkConf": {
 				"spark.master": "local[*, 4]"
 			},
