@@ -7,37 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf2fabricv1"
 		},
-		"AzureDataLakeStorage1_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
-		},
-		"AzureDataLakeStorage2_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage2'"
-		},
-		"AzureDatabricks1_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'AzureDatabricks1'"
-		},
 		"Sathvik_ADF_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Sathvik_ADF'"
 		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorage2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://storagebp.dfs.core.windows.net/"
-		},
 		"Sathvik_ADF_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://adfteststoragebhavana.dfs.core.windows.net/"
+			"defaultValue": "https://storagebrr.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -1584,10 +1560,10 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Runs the two Spark notebooks on Azure Databricks (external compute): NB_Read_Raw_Data then NB_Transform_Cab_Data, as the Synapse original did with Synapse notebooks.",
+				"description": "Runs the two Spark notebooks as Databricks jobs on serverless compute (the workspace is serverless-only): NB_Read_Raw_Data, then NB_Transform_Cab_Data.",
 				"activities": [
 					{
-						"name": "Job1",
+						"name": "Generate_CSV_And_Parquet",
 						"type": "DatabricksJob",
 						"dependsOn": [],
 						"policy": {
@@ -1607,11 +1583,11 @@
 						}
 					},
 					{
-						"name": "Job2",
+						"name": "Transform_Parquet",
 						"type": "DatabricksJob",
 						"dependsOn": [
 							{
-								"activity": "Job1",
+								"activity": "Generate_CSV_And_Parquet",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -1626,7 +1602,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"jobId": "1080769789763787"
+							"jobId": "624224332531621"
 						},
 						"linkedServiceName": {
 							"referenceName": "AzureDatabricks1",
@@ -1637,8 +1613,7 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2026-09-29T13:54:03Z"
+				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
@@ -1843,40 +1818,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Discovery_Parquet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"pFileName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@dataset().pFileName",
-							"type": "Expression"
-						},
-						"folderPath": "migration-test/parquet",
-						"fileSystem": "migrationcontainer"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DS_CSV_Customers')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1909,6 +1850,132 @@
 					},
 					{
 						"name": "City",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_CSV_Employees')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Employees.csv",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "employee_id",
+						"type": "String"
+					},
+					{
+						"name": "employee_name",
+						"type": "String"
+					},
+					{
+						"name": "department",
+						"type": "String"
+					},
+					{
+						"name": "job_title",
+						"type": "String"
+					},
+					{
+						"name": "store_id",
+						"type": "String"
+					},
+					{
+						"name": "city",
+						"type": "String"
+					},
+					{
+						"name": "hire_date",
+						"type": "String"
+					},
+					{
+						"name": "annual_salary",
+						"type": "Int64"
+					},
+					{
+						"name": "manager_id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_CSV_Products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sathvik_ADF",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Products.csv",
+						"fileSystem": "migrationcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "product_id",
+						"type": "String"
+					},
+					{
+						"name": "product_name",
+						"type": "String"
+					},
+					{
+						"name": "category",
+						"type": "String"
+					},
+					{
+						"name": "sub_category",
+						"type": "String"
+					},
+					{
+						"name": "unit_price",
+						"type": "Int64"
+					},
+					{
+						"name": "cost_price",
+						"type": "Int64"
+					},
+					{
+						"name": "launched_on",
+						"type": "String"
+					},
+					{
+						"name": "is_active",
 						"type": "String"
 					}
 				]
@@ -2066,47 +2133,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_Customers_CSV_Source')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Customers.csv",
-						"fileSystem": "migrationcontainer"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "CustomerId",
-						"type": "String"
-					},
-					{
-						"name": "CustomerName",
-						"type": "String"
-					},
-					{
-						"name": "City",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DS_Cutomers_Parquet_Sink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2130,44 +2156,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Parquet_Customers')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultStorage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "migration-test/parquet/customers",
-						"fileSystem": "migrationcontainer"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "CustomerId",
-						"type": "String"
-					},
-					{
-						"name": "CustomerName",
-						"type": "String"
-					},
-					{
-						"name": "City",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultStorage')]"
 			]
 		},
 		{
@@ -2211,44 +2199,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Sathvik_ADF')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_Processed_Sales_By_City_Product')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "transportationsynapsemigration-WorkspaceDefaultStorage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "migration-test/processed/sales_by_city_product",
-						"fileSystem": "migrationcontainer"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "City",
-						"type": "String"
-					},
-					{
-						"name": "Product",
-						"type": "String"
-					},
-					{
-						"name": "TotalAmount",
-						"type": "Int64"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/transportationsynapsemigration-WorkspaceDefaultStorage')]"
 			]
 		},
 		{
@@ -2487,52 +2437,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime7593",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime7593')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage2_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('AzureDataLakeStorage2_accountKey')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AzureIRMigrationTesting",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIRMigrationTesting')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -2540,45 +2444,9 @@
 				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
-					"domain": "https://adb-7405617008097962.2.azuredatabricks.net/?o=7405617008097962&l=en",
-					"accessToken": {
-						"type": "SecureString",
-						"value": "[parameters('AzureDatabricks1_accessToken')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AzureIRMigrationTesting",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIRMigrationTesting')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Databricks')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Azure Databricks dbw-adf-migration. Job cluster per activity: single node Standard_D4ds_v5, DBR 15.4 LTS, Unity Catalog single-user (cluster policy adf-migration-single-node). Auth: factory managed identity (Contributor on the workspace).",
-				"annotations": [],
-				"type": "AzureDatabricks",
-				"typeProperties": {
-					"domain": "https://adb-7405618998257241.1.azuredatabricks.net",
+					"domain": "https://adb-7405617008097962.2.azuredatabricks.net/",
 					"authentication": "MSI",
-					"workspaceResourceId": "/subscriptions/dbd817b4-9d82-42c5-85b5-8ec49b01907d/resourceGroups/adf_to_fabric/providers/Microsoft.Databricks/workspaces/dbw-adf-migration",
-					"newClusterNodeType": "Standard_D4ds_v5",
-					"newClusterNumOfWorker": "1:2",
-					"newClusterSparkConf": {
-						"spark.master": "local[*, 4]"
-					},
-					"newClusterCustomTags": {
-						"project": "adf-migration"
-					},
-					"newClusterVersion": "15.4.x-scala2.12",
-					"clusterOption": "Autoscaling",
-					"newClusterInitScripts": [],
-					"policyId": "0018796FECE9BEFE"
+					"workspaceResourceId": "/subscriptions/3bca8b73-07f7-40c8-a909-91edb4df9bb6/resourceGroups/rg_adf_to_fabric/providers/Microsoft.Databricks/workspaces/databricksbp"
 				},
 				"connectVia": {
 					"referenceName": "AzureIRMigrationTesting",
@@ -2611,19 +2479,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIRMigrationTesting')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/transportationsynapsemigration-WorkspaceDefaultStorage')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",

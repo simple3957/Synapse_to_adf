@@ -5,29 +5,11 @@
 		"factoryName": {
 			"value": "adf2fabricv1"
 		},
-		"AzureDataLakeStorage1_accountKey": {
-			"value": ""
-		},
-		"AzureDataLakeStorage2_accountKey": {
-			"value": ""
-		},
-		"AzureDatabricks1_accessToken": {
-			"value": ""
-		},
 		"Sathvik_ADF_accountKey": {
 			"value": ""
 		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"value": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorage2_properties_typeProperties_url": {
-			"value": "https://storagebp.dfs.core.windows.net/"
-		},
 		"Sathvik_ADF_properties_typeProperties_url": {
-			"value": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"value": "https://adfteststoragebhavana.dfs.core.windows.net/"
+			"value": "https://storagebrr.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"value": ""

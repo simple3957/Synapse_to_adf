@@ -7,37 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf2fabricv1"
 		},
-		"AzureDataLakeStorage1_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
-		},
-		"AzureDataLakeStorage2_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage2'"
-		},
-		"AzureDatabricks1_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'AzureDatabricks1'"
-		},
 		"Sathvik_ADF_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'Sathvik_ADF'"
 		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"AzureDataLakeStorage2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://storagebp.dfs.core.windows.net/"
-		},
 		"Sathvik_ADF_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://datamigrationadftofabric.dfs.core.windows.net/"
-		},
-		"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://adfteststoragebhavana.dfs.core.windows.net/"
+			"defaultValue": "https://storagebrr.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -66,26 +42,8 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"AzureDataLakeStorage1_accountKey": {
-						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
-					},
-					"AzureDataLakeStorage2_accountKey": {
-						"value": "[parameters('AzureDataLakeStorage2_accountKey')]"
-					},
-					"AzureDatabricks1_accessToken": {
-						"value": "[parameters('AzureDatabricks1_accessToken')]"
-					},
 					"Sathvik_ADF_accountKey": {
 						"value": "[parameters('Sathvik_ADF_accountKey')]"
-					},
-					"transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url": {
-						"value": "[parameters('transportationsynapsemigration-WorkspaceDefaultStorage_properties_typeProperties_url')]"
-					},
-					"AzureDataLakeStorage1_properties_typeProperties_url": {
-						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-					},
-					"AzureDataLakeStorage2_properties_typeProperties_url": {
-						"value": "[parameters('AzureDataLakeStorage2_properties_typeProperties_url')]"
 					},
 					"Sathvik_ADF_properties_typeProperties_url": {
 						"value": "[parameters('Sathvik_ADF_properties_typeProperties_url')]"
