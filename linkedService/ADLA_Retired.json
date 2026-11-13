@@ -1,0 +1,12 @@
+{
+	"name": "ADLA_Retired",
+	"properties": {
+		"annotations": [],
+		"description": "Test only: Azure Data Lake Analytics was retired on 29 Feb 2024. This account does not exist; the pipeline using it is never run.",
+		"type": "AzureDataLakeAnalytics",
+		"typeProperties": {
+			"accountName": "adlaretiredtest",
+			"tenant": "00000000-0000-0000-0000-000000000000"
+		}
+	}
+}

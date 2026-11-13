@@ -1,0 +1,63 @@
+{
+	"name": "DF_Sales_By_Product",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"scriptLines": [
+				"source(output(",
+				"          SaleId as string,",
+				"          CustomerId as string,",
+				"          Product as string,",
+				"          Amount as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> SalesCsv",
+				"SalesCsv filter(Amount > 0L) ~> PositiveAmount",
+				"PositiveAmount derive(AmountBand = iif(Amount >= 50000L, 'high', 'low')) ~> Banded",
+				"Banded aggregate(groupBy(Product,",
+				"          AmountBand),",
+				"     TotalAmount = sum(Amount),",
+				"          Sales = count()) ~> ByProduct",
+				"ByProduct sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     truncate: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ParquetSink"
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DF_Sales_By_Product",
+						"type": "DatasetReference"
+					},
+					"name": "ParquetSink"
+				}
+			],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_CSV_Sales",
+						"type": "DatasetReference"
+					},
+					"name": "SalesCsv"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PositiveAmount"
+				},
+				{
+					"name": "Banded"
+				},
+				{
+					"name": "ByProduct"
+				}
+			]
+		}
+	}
+}

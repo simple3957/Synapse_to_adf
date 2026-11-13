@@ -1,0 +1,20 @@
+{
+	"name": "DS_DF_Sales_By_Product",
+	"properties": {
+		"annotations": [],
+		"linkedServiceName": {
+			"referenceName": "Sathvik_ADF",
+			"type": "LinkedServiceReference"
+		},
+		"schema": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"compressionCodec": "snappy",
+			"location": {
+				"fileSystem": "migrationcontainer",
+				"folderPath": "migration-test/dataflow/sales_by_product",
+				"type": "AzureBlobFSLocation"
+			}
+		}
+	}
+}

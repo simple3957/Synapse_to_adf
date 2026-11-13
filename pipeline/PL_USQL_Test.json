@@ -1,0 +1,39 @@
+{
+	"name": "PL_USQL_Test",
+	"properties": {
+		"activities": [
+			{
+				"dependsOn": [],
+				"linkedServiceName": {
+					"referenceName": "ADLA_Retired",
+					"type": "LinkedServiceReference"
+				},
+				"name": "USQL_Sales_By_Product",
+				"policy": {
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureInput": false,
+					"secureOutput": false,
+					"timeout": "0.01:00:00"
+				},
+				"type": "DataLakeAnalyticsU-SQL",
+				"typeProperties": {
+					"degreeOfParallelism": 1,
+					"parameters": {
+						"in": "/emp.csv",
+						"out": "/migration-test/usql/sales_by_product/sales_by_product.csv"
+					},
+					"priority": 1000,
+					"scriptLinkedService": {
+						"referenceName": "Sathvik_ADF",
+						"type": "LinkedServiceReference"
+					},
+					"scriptPath": "migrationcontainer/usql/sales_by_product.usql"
+				},
+				"userProperties": []
+			}
+		],
+		"annotations": [],
+		"description": "Test only, never run: U-SQL source for the migrator's model-drafted notebook path."
+	}
+}
