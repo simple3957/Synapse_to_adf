@@ -1,0 +1,32 @@
+{
+	"name": "PL_DatabricksJob_Params_Test",
+	"properties": {
+		"activities": [
+			{
+				"dependsOn": [],
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				},
+				"name": "Run_Param_Job",
+				"policy": {
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureInput": false,
+					"secureOutput": false,
+					"timeout": "0.01:00:00"
+				},
+				"type": "DatabricksJob",
+				"typeProperties": {
+					"jobId": "966606862549342",
+					"jobParameters": {
+						"run_date": "2026-11-13"
+					}
+				},
+				"userProperties": []
+			}
+		],
+		"annotations": [],
+		"description": "Test for the migrator: a Databricks Job activity passing a job parameter to a job with a notebook task (base parameter) and a Python file task."
+	}
+}
