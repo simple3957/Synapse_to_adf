@@ -1,0 +1,29 @@
+{
+	"name": "PL_DatabricksJob_Lib_Test",
+	"properties": {
+		"activities": [
+			{
+				"dependsOn": [],
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				},
+				"name": "Run_Lib_Job",
+				"policy": {
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureInput": false,
+					"secureOutput": false,
+					"timeout": "0.01:00:00"
+				},
+				"type": "DatabricksJob",
+				"typeProperties": {
+					"jobId": "654536618723855"
+				},
+				"userProperties": []
+			}
+		],
+		"annotations": [],
+		"description": "Test for the migrator: a Databricks Job activity whose job's environment installs a custom wheel and a PyPI package."
+	}
+}
